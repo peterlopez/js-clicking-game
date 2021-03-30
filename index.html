@@ -3,8 +3,67 @@
   <head>
     <meta charset='utf-8'>
     <meta name='viewport' content='width=device-width'>
-    <title>Javascript click game</title>
-    <link href='style.css' rel='stylesheet' type='text/css' />
+    <title>Javascript Clicking Game</title>
+    <style>
+html {
+  background: #eee;
+  height: 100%;
+}
+body {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.center {
+  text-align: center;
+  margin-bottom: 15%;
+}
+
+#js-counter {
+  transition: 0.8s color ease;
+  cursor: default;
+}
+
+
+#js-click {
+  background: #FF4136;
+  color: #fff;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  font-weight: bold;
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 8px;
+}
+#js-click:focus {
+  outline: none;
+}
+#js-click.disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+#js-click.disabled:active {
+  border-style: outset;
+}
+
+#js-playAgain {
+  padding: 1rem;
+  font-size: 1.25rem;
+}
+#js-playAgain:visited {
+  color: blue;
+}
+
+.warmer1 { color: #0074D9; }
+.warmer2 { color: #7FDBFF; }
+.warmer3 { color: #39CCCC; }
+.warmer4 { color: #FFDC00; }
+.warmer5 { color: #FF851B; }
+.warmer6 { color: #FF4136; transition: none; }
+.winner  { color: #2ECC40; transition: none; }
+    </style>
   </head>
   <body>
     <div class='center'>
@@ -13,6 +72,82 @@
       <br>
       <a id='js-playAgain' href='/' style='visibility: hidden;' title='Play Again!'>Play Again!</a>
     </div>
-    <script src='script.js'></script>
+    <script>
+var $counter = document.querySelector('#js-counter');
+
+var $clickBtn = document.querySelector('#js-click');
+$clickBtn.onclick = clickHandler;
+
+window.countdown_delay = 333;
+window.countdown_accel = 1.28;
+
+window.warmer = [2, 15, 25, 40, 60, 80, 100];
+
+// Function called each time button is clicked
+// also called again to go back down after MS_DELAY
+function clickHandler()
+{
+  // cancel countdown timer
+  clearInterval(window.countdownId);
+
+  // Get current counter value
+  var $counter = document.querySelector('#js-counter');
+  var numClicks = parseInt($counter.innerHTML);
+
+  // Reached end, WINNER!
+  if (numClicks >= window.warmer[ window.warmer.length-1 ]) {
+    $counter.classList.add('winner');
+
+    $clickBtn = document.querySelector('#js-click');
+    $clickBtn.classList.add('disabled');
+    $clickBtn.innerHTML = 'You won!';
+
+    $playAgain = document.querySelector('#js-playAgain');
+    $playAgain.style.visibility = 'inherit';
+
+    return;
+  }
+
+  // Add warmer CSS class
+  var i = window.warmer.length - 2;
+  for (i; i >= 0; i--) {
+    if (numClicks >= window.warmer[i]) {
+      $counter.classList.add('warmer'+(i+1));
+      break;
+    }
+  }
+
+  // Update counter value
+  $counter.innerHTML = numClicks + 1;
+
+  // set countdown timer
+  window.countdownId = setInterval(countdown, countdown_delay - (numClicks * countdown_accel));
+}
+
+function countdown()
+{
+  // Get current counter value
+  var $counter = document.querySelector('#js-counter');
+  var numClicks = parseInt($counter.innerHTML);
+  console.log('counting down from ', numClicks);
+
+  // remove warmer CSS class
+  var i = window.warmer.length - 2;
+  for (i; i >= 0; i--) {
+    if (numClicks < window.warmer[i]) {
+      $counter.classList.remove('warmer'+(i+1));
+    }
+  }
+  
+  // Stop at 0 and finsh
+  if (numClicks == 0 || numClicks == window.warmer[window.warmer.length - 1]) {
+    clearInterval(window.countdownId);
+    return;
+  }
+
+  // Update counter value
+  $counter.innerHTML = numClicks - 1;
+}
+    </script>
   </body>
 </html>
