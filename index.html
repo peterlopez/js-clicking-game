@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <meta charset='utf-8'>
-    <meta name='viewport' content='width=device-width'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
     <title>Javascript Clicking Game</title>
     <style>
 html {
@@ -24,7 +24,6 @@ body {
   transition: 0.8s color ease;
   cursor: default;
 }
-
 
 #js-click {
   background: #FF4136;
@@ -56,13 +55,13 @@ body {
   color: blue;
 }
 
-.warmer1 { color: #0074D9; }
-.warmer2 { color: #7FDBFF; }
-.warmer3 { color: #39CCCC; }
-.warmer4 { color: #FFDC00; }
-.warmer5 { color: #FF851B; }
-.warmer6 { color: #FF4136; transition: none; }
-.winner  { color: #2ECC40; transition: none; }
+[data-warm='1'] { color: #0074D9; }
+[data-warm='2'] { color: #7FDBFF; }
+[data-warm='3'] { color: #39CCCC; }
+[data-warm='4'] { color: #FFDC00; }
+[data-warm='5'] { color: #FF851B; }
+[data-warm='6'] { color: #FF4136; transition: none; }
+[data-warm='7']  { color: #2ECC40; transition: none; }
     </style>
   </head>
   <body>
@@ -73,9 +72,8 @@ body {
       <a id='js-playAgain' href='/' style='visibility: hidden;' title='Play Again!'>Play Again!</a>
     </div>
     <script>
-var $counter = document.querySelector('#js-counter');
-
-var $clickBtn = document.querySelector('#js-click');
+var $counter = document.getElementById('js-counter');
+var $clickBtn = document.getElementById('js-click');
 $clickBtn.onclick = clickHandler;
 
 window.countdown_delay = 333;
@@ -91,28 +89,26 @@ function clickHandler()
   clearInterval(window.countdownId);
 
   // Get current counter value
-  var $counter = document.querySelector('#js-counter');
-  var numClicks = parseInt($counter.innerHTML);
+  let $counter = document.getElementById('js-counter');
+  let numClicks = parseInt($counter.innerHTML);
 
   // Reached end, WINNER!
   if (numClicks >= window.warmer[ window.warmer.length-1 ]) {
-    $counter.classList.add('winner');
 
-    $clickBtn = document.querySelector('#js-click');
+    $clickBtn = document.getElementById('js-click');
     $clickBtn.classList.add('disabled');
-    $clickBtn.innerHTML = 'You won!';
+    $clickBtn.innerHTML = 'Congratulations!';
 
-    $playAgain = document.querySelector('#js-playAgain');
+    $playAgain = document.getElementById('js-playAgain');
     $playAgain.style.visibility = 'inherit';
 
     return;
   }
 
   // Add warmer CSS class
-  var i = window.warmer.length - 2;
-  for (i; i >= 0; i--) {
+  for (let i = window.warmer.length - 2; i >= 0; i--) {
     if (numClicks >= window.warmer[i]) {
-      $counter.classList.add('warmer'+(i+1));
+      $counter.dataset.warm = i+1;
       break;
     }
   }
@@ -127,19 +123,18 @@ function clickHandler()
 function countdown()
 {
   // Get current counter value
-  var $counter = document.querySelector('#js-counter');
+  var $counter = document.getElementById('js-counter');
   var numClicks = parseInt($counter.innerHTML);
-  console.log('counting down from ', numClicks);
+  // console.debug('counting down from ', numClicks);
 
   // remove warmer CSS class
-  var i = window.warmer.length - 2;
-  for (i; i >= 0; i--) {
+  for (let i = window.warmer.length - 2; i >= 0; i--) {
     if (numClicks < window.warmer[i]) {
-      $counter.classList.remove('warmer'+(i+1));
+      $counter.dataset.warm = i;
     }
   }
-  
-  // Stop at 0 and finsh
+
+  // Stop at 0 and at last warmer point
   if (numClicks == 0 || numClicks == window.warmer[window.warmer.length - 1]) {
     clearInterval(window.countdownId);
     return;
